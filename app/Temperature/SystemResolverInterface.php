@@ -3,8 +3,7 @@ namespace App\Temperature;
 
 interface SystemResolverInterface
 {
-    public function system();
-    public function addSystem($name);
-    public function getAverageTemperature():string;
-    
+    public function getSystems();
+    public function addSystem(SystemInterface $weather_system);
+    public function handle();
 }

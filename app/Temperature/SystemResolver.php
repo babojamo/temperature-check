@@ -1,19 +1,40 @@
 <?php
 namespace App\Temperature;
 
-class SystemResolver implements SystemResolverInterface
+class SystemResolver extends Weather implements SystemResolverInterface
 {
 
     protected $weather_systems=[];
-    
-    
+
     /**
      * Constructor accepts an option for initial source of weather system
      */
-    public function __construct(SystemInterface $system=null)
+    public function __construct($country,$city)
     {
-        if($system)
-            $this->addSystem($system);
+        $this->country=$country;
+        $this->city=$city;
+
+        $this->loadWeatherSystems();
+    }
+
+    public function loadWeatherSystems()
+    {
+        $this->setDefaultFormat(config('weather.default'));
+        $sources=config('weather.sources');
+
+        foreach ($sources as $source) {
+
+            $weather=new $source($this->country,$this->city);
+            $weather->setDefaultFormat($this->getDefaultFormat());
+
+            $this->addSystem($weather);
+        }
+
+    }
+
+    public function getCacheKey()
+    {
+        return $this->country.'_'.$this->city;
     }
 
     /**
@@ -21,26 +42,29 @@ class SystemResolver implements SystemResolverInterface
      * @param $weather_system
      */
     public function addSystem(SystemInterface $weather_system){
+
         $this->weather_systems[]=$weather_system;
+
     }
 
-
-    /**
-     * Get the average temperature from all weather system sources
-     * @param $average
-     */
-    public function getAverageTemperature()
+    public function getSystems()
     {
-        $sum_temperature=0;
+        return $this->weather_systems;
+    }
 
-        array_map(function($system){
-            
-            $sum_temperature+=$system->getTemperature();
+    public function handle()
+    {
+        $temperature=0;
 
-        },$this->weather_systems);
-        
-        $average=$sum_temperature/count($this->weather_systems);
+        foreach ($this->weather_systems as $weather_system) {
 
-        return $average;
+            $weather_system->handle();
+
+            $temperature+=$weather_system->getTemperature();
+        }
+
+        $average_temperature=$temperature/count($this->weather_systems);
+
+        $this->setTemperature($average_temperature);
     }
 }

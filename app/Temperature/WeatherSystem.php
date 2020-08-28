@@ -1,19 +1,17 @@
 <?php
 namespace App\Temperature;
 
-abstract class WeatherSystem implements SystemInterface
+abstract class WeatherSystem extends Weather implements SystemInterface
 {
     protected $base_url;
 
     protected $attributes=[];
 
-    protected $temperature;
- 
-    public function getTemperature()
+    public function getCacheKey()
     {
-        return $this->temperature;
+        return $this->country.$this->city;
     }
-
+ 
     public function setAttribute($key,$value)
     {
         $this->attributes[$key]=$value;
@@ -26,7 +24,7 @@ abstract class WeatherSystem implements SystemInterface
 
     public function getFullUrl()
     {
-        return $this->url.'?'.http_build_query($this->attributes);
+        return $this->base_url.'?'.http_build_query($this->attributes);
     }
 
     public abstract function handle();

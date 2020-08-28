@@ -10,9 +10,18 @@ trait WeatherTrait
      */
     public function executeApi()
     {
-        $client = new GuzzleHttp\Client();
-        $res = $client->request('GET', $this->getFullUrl());
+        try {
 
-        dump($res);
+            $client = new Client();
+            $response = $client->request('GET', $this->getFullUrl());
+            
+            return $response->getBody()->getContents();
+
+        } catch (\Throwable $error) {
+
+            throw new \Exception($error->getMessage());
+
+        }
+        
     }
 }

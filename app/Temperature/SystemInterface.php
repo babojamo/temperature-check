@@ -1,12 +1,11 @@
 <?php
 namespace App\Temperature;
 
-interface SystemInterface
+interface SystemInterface 
 {
-    public function getTemperature();
-
     public function setAttribute($key,$value);
 
     public function getAttribute($key);
 
+    public function getFullUrl();
 }
