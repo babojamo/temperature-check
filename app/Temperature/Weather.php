@@ -2,6 +2,7 @@
 namespace App\Temperature;
 use App\Temperature\Helpers\TemperatureConverter as Converter;
 use App\Temperature\TemperatureType;
+use App\Temperature\Contracts\WeatherInterface;
 
 abstract class Weather implements WeatherInterface
 {
@@ -13,45 +14,13 @@ abstract class Weather implements WeatherInterface
 
     public function getTemperature()
     {
-        return $this->temperature;
+        return number_format($this->temperature,1);
     }
 
     public function setTemperature($temperature)
     {
         $this->temperature=$temperature;
     }
-
-    public function getFahrenheit()
-    {
-        if($this->default_format==TemperatureType::FAHRENHEIT)
-
-            return $this->getTemperature();
-        else
-
-            return Converter::convert($this->default_format,TemperatureType::FAHRENHEIT,$this->getTemperature());
-    }
-
-    public function getKelvin()
-    {
-        if($this->default_format==TemperatureType::KELVIN)
-
-            return $this->getTemperature();
-        else
-
-            return Converter::convert($this->default_format,TemperatureType::FAHRENHEIT,$this->getTemperature());
-    }
-
-    public function getCelsius()
-    {
-        if($this->default_format==TemperatureType::CELSIUS)
-
-            return $this->getTemperature();
-
-        else
-
-            return Converter::convert($this->default_format,TemperatureType::CELSIUS,$this->getTemperature());
-    }
-
 
     public function setDefaultFormat(string $format)
     {
@@ -62,15 +31,16 @@ abstract class Weather implements WeatherInterface
     {
         return $this->default_format;
     }
-
-
-    public function getTemperatures()
-    {
-        return [
-            'kelvin' => $this->getKelvin(),
-            'celsius' => $this->getCelsius(),
-            'fahrenheit' => $this->getFahrenheit()
-        ];
-    }
     
+    public function changeFormat(string $format)
+    {
+        if($format!=$this->getDefaultFormat())
+        {
+            $this->setTemperature(Converter::convert($this->getDefaultFormat(),$format,$this->getTemperature()));
+        }
+
+        $this->setDefaultFormat($format);
+
+        return $this->getDefaultFormat();
+    }
 }

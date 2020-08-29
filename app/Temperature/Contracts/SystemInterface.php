@@ -1,5 +1,5 @@
 <?php
-namespace App\Temperature;
+namespace App\Temperature\Contracts;
 
 interface SystemInterface 
 {

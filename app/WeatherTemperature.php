@@ -9,9 +9,9 @@ class WeatherTemperature extends Model
     protected $fillable=[
         'country',
         'city',
-        'celsius',
-        'kelvin',
-        'fahrenheit'
+        'format',
+        'temperature',
+        'date'
     ];
 
     protected $hidden=[

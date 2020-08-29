@@ -1,6 +1,9 @@
 <?php
 namespace App\Temperature;
 
+use App\Temperature\Contracts\SystemResolverInterface;
+use App\Temperature\Contracts\SystemInterface;
+
 class SystemResolver extends Weather implements SystemResolverInterface
 {
 
@@ -25,16 +28,15 @@ class SystemResolver extends Weather implements SystemResolverInterface
         foreach ($sources as $source) {
 
             $weather=new $source($this->country,$this->city);
-            $weather->setDefaultFormat($this->getDefaultFormat());
-
             $this->addSystem($weather);
+
         }
 
     }
 
     public function getCacheKey()
     {
-        return $this->country.'_'.$this->city;
+        return $this->country.'_'.$this->city.now()->format("Ymd");
     }
 
     /**
@@ -55,16 +57,28 @@ class SystemResolver extends Weather implements SystemResolverInterface
     public function handle()
     {
         $temperature=0;
+        $counter=0;
 
         foreach ($this->weather_systems as $weather_system) {
+            
+            if($weather_system->handle())
+            {
+                $counter++;
 
-            $weather_system->handle();
+                $weather_system->changeFormat($this->getDefaultFormat()); # Change to general temperature format
+                $temperature+=$weather_system->getTemperature();
 
-            $temperature+=$weather_system->getTemperature();
+            }
+            
+            \Log::info(\get_class($weather_system).':'.$weather_system->getTemperature());
+            
         }
 
-        $average_temperature=$temperature/count($this->weather_systems);
+        if(!$counter)
+            abort(404,'City/Country could not be found!');
+        if($counter>1)
+            $temperature=$temperature/count($this->weather_systems);
 
-        $this->setTemperature($average_temperature);
+        $this->setTemperature($temperature);
     }
 }

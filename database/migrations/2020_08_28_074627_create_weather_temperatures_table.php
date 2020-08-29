@@ -19,9 +19,9 @@ class CreateWeatherTemperaturesTable extends Migration
             $table->string('city');
             $table->string('country');
 
-            $table->double('kelvin');
-            $table->double('celsius');
-            $table->double('fahrenheit');
+            $table->double('temperature');
+            $table->string('format');
+            $table->date('date');;
 
             $table->timestamps();
         });

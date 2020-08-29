@@ -1,6 +1,9 @@
 <?php
 namespace App\Temperature;
 
+use App\Temperature\Contracts\SystemInterface;
+
+
 abstract class WeatherSystem extends Weather implements SystemInterface
 {
     protected $base_url;

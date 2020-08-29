@@ -14,15 +14,20 @@ class WeatherController extends Controller
             'city' => 'required',
             'country' => 'required'
         ]);
-
+        
         $country=$request->country;
         $city=$request->city;
 
         $resolver=new SystemResolver($country,$city);
-        $resolver->handle();
 
-        $temperature=$this->temperatureCache($resolver);
- 
+        $temperature=$this->getTemperatureCache($resolver);
+
+        if(!$temperature)
+        {
+            $resolver->handle();
+            $temperature=$this->setTemperatureCache($resolver);
+        }
+
         return response()->json($temperature);
     }
 
@@ -31,17 +36,22 @@ class WeatherController extends Controller
         $temperature=WeatherTemperature::firstOrCreate([
             'country' => $resolver->country,
             'city' => $resolver->city,
-            'kelvin' => $resolver->getKelvin(),
-            'celsius' => $resolver->getCelsius(),
-            'fahrenheit' => $resolver->getFahrenheit()
+            'temperature' => $resolver->getTemperature(),
+            'format'=>$resolver->getDefaultFormat(),
+            'date'=>now()
         ]);
 
         return $temperature;
     }
 
-    private function temperatureCache(SystemResolver $resolver)
+    private function getTemperatureCache(SystemResolver $resolver)
     {
-        return cache()->rememberForever('_'.$resolver->getCacheKey(), function () use($resolver) {
+        return cache()->get($resolver->getCacheKey());
+    }
+
+    private function setTemperatureCache(SystemResolver $resolver)
+    {
+        return cache()->rememberForever($resolver->getCacheKey(), function () use($resolver) {
             return $this->fetch($resolver);
         });
     }
