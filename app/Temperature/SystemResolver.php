@@ -2,7 +2,6 @@
 namespace App\Temperature;
 
 use App\Temperature\Contracts\SystemResolverInterface;
-use App\Temperature\Contracts\SystemInterface;
 
 class SystemResolver extends Weather implements SystemResolverInterface
 {
@@ -43,7 +42,7 @@ class SystemResolver extends Weather implements SystemResolverInterface
      * Add weather system source
      * @param $weather_system
      */
-    public function addSystem(SystemInterface $weather_system){
+    public function addSystem(WeatherSystem $weather_system){
 
         $this->weather_systems[]=$weather_system;
 
@@ -61,7 +60,7 @@ class SystemResolver extends Weather implements SystemResolverInterface
 
         foreach ($this->weather_systems as $weather_system) {
             
-            if($weather_system->handle())
+            if($weather_system->executeApi())
             {
                 $counter++;
 

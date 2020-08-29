@@ -7,45 +7,29 @@ use App\Temperature\TemperatureType;
 
 class WeatherAPI extends WeatherSystem
 {
-    use APIHandler;
-
-    public function __construct($country,$city)
-    {
-        $this->country=$country;
-        $this->city=$city;
-
-        
-        $this->init();
-        
-    }
-    
-    public function init()
+    public function bind()
     {
         // Setup necessary api configuration
-        $this->base_url=config('weather.weatherapi.base_url');
-        $this->setAttribute("key",config('weather.weatherapi.app_id'));
+        $this->setBaseUrl(config('weather.weatherapi.base_url'));
+        $this->setParameter("key",config('weather.weatherapi.app_id'));
         
         // Set api parameters or attributes
-        $this->setAttribute("q",$this->city.','.$this->country);
+        $this->setParameter("q",$this->city.','.$this->country);
+    }
+    
+    /**
+     * Handle the success execution result of API Call
+     */
+    public function result($payload)
+    {
+        $result=json_decode($payload);
+        $this->setTemperature($result->current->temp_c);
     }
 
-    public function handle()
+    public function errorHandler($exception)
     {
-        try {
-            
-            $result=json_decode($this->executeApi());
-            $this->setTemperature($result->current->temp_c);
-
-        } catch (\Throwable $error) {
-            
-            $erorr_code=$error->getCode();
-
-            if($erorr_code==400)
-                return null;
-            else
-                abort(422,"An unknown error occured when getting the weather temperature!");
-        }
-
-        return $this;
+        $error_code=$exception->getCode();
+        if($error_code!=400)
+            abort(422,"An unknown error occured when getting the weather temperature!");
     }
 }
