@@ -2,8 +2,6 @@
 namespace App\Temperature\WeatherServices;
 
 use App\Temperature\WeatherSystem;
-use App\Temperature\Helpers\WeatherTrait as APIHandler;
-use App\Temperature\TemperatureType;
 
 class WeatherAPI extends WeatherSystem
 {

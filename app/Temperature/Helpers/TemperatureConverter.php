@@ -1,8 +1,6 @@
 <?php
 namespace App\Temperature\Helpers;
 
-use App\Temperature\TemperatureType;
-
 class TemperatureConverter
 {  
     public static function convert(string $from,string $to,$value)

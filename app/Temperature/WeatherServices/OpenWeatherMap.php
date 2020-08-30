@@ -2,7 +2,6 @@
 namespace App\Temperature\WeatherServices;
 
 use App\Temperature\WeatherSystem;
-
 use App\Temperature\TemperatureType;
 
 class OpenWeatherMap extends WeatherSystem

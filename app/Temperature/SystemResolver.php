@@ -9,7 +9,9 @@ class SystemResolver extends Weather implements SystemResolverInterface
     protected $weather_systems=[];
 
     /**
-     * Constructor accepts an option for initial source of weather system
+     * Required parameters country and city
+     * @param $country
+     * @param $city
      */
     public function __construct($country,$city)
     {
@@ -19,6 +21,9 @@ class SystemResolver extends Weather implements SystemResolverInterface
         $this->loadWeatherSystems();
     }
 
+    /**
+     * Load the weather source providers
+     */
     public function loadWeatherSystems()
     {
         $this->setDefaultFormat(config('weather.default'));
@@ -33,6 +38,11 @@ class SystemResolver extends Weather implements SystemResolverInterface
 
     }
 
+
+    /**
+     * Cache key for data caching
+     * Based on country, city and current date
+     */
     public function getCacheKey()
     {
         return $this->country.'_'.$this->city.now()->format("Ymd");
@@ -48,11 +58,17 @@ class SystemResolver extends Weather implements SystemResolverInterface
 
     }
 
+    /**
+     * Get the weather sources
+     */
     public function getSystems()
     {
         return $this->weather_systems;
     }
 
+    /**
+     * Handles / execute the weather sources api
+     */
     public function handle()
     {
         $temperature=0;
@@ -62,14 +78,13 @@ class SystemResolver extends Weather implements SystemResolverInterface
             
             if($weather_system->executeApi())
             {
+                // Log the successfull api execution for data checking
                 $counter++;
 
                 $weather_system->changeFormat($this->getDefaultFormat()); # Change to general temperature format
                 $temperature+=$weather_system->getTemperature();
 
             }
-            
-            \Log::info(\get_class($weather_system).':'.$weather_system->getTemperature());
             
         }
 

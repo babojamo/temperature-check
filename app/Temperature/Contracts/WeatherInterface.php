@@ -1,8 +1,6 @@
 <?php
 namespace App\Temperature\Contracts;
 
-use App\Temperature\TemperatureType;
-
 interface WeatherInterface
 {
     public function getTemperature();

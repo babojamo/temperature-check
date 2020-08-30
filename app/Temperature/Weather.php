@@ -34,6 +34,8 @@ abstract class Weather implements WeatherInterface
     
     public function changeFormat(string $format)
     {
+
+        // Change also the temperature whenever the format is change
         if($format!=$this->getDefaultFormat())
         {
             $this->setTemperature(Converter::convert($this->getDefaultFormat(),$format,$this->getTemperature()));
