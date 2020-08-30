@@ -10,8 +10,8 @@ class WeatherAPI extends WeatherSystem
     public function bind()
     {
         // Setup necessary api configuration
-        $this->setBaseUrl(config('weather.weatherapi.base_url'));
-        $this->setParameter("key",config('weather.weatherapi.app_id'));
+        $this->setBaseUrl(config('weather.api.weatherapi.base_url'));
+        $this->setParameter("key",config('weather.api.weatherapi.app_id'));
         
         // Set api parameters or attributes
         $this->setParameter("q",$this->city.','.$this->country);

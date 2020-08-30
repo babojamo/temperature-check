@@ -3,7 +3,6 @@ namespace App\Temperature\Contracts;
 
 interface SystemApiInterface 
 {
-
     public function executeApi();
 
     public function errorHandler($exception);

@@ -75,6 +75,6 @@ trait WeatherApiTrait
 
     public function errorHandler($exception)
     {
-        abort(422,"An unknown error occured when getting the weather temperature!");
+        throw new \Exception("Weather Temperature Error: ".$exception->getMessage());
     }
 }

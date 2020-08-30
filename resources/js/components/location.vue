@@ -1,9 +1,7 @@
 <template>
-    <input @keydown.enter.prevent="true" type="text" v-model="addressValue" class="form-control">
+    <select2 :options="options" :placeholder="placeholder" :required="required" v-model="location"></select2>
 </template>
 <script>
-    import autocomplete from 'autocompleter';
-
     export default {
 
         props: {
@@ -11,106 +9,97 @@
             searchType: {
                 type: String,
                 default () {
-                    // Default coverage is city
-                    return "city";
+                    // Default coverage is countries
+                    return "countries";
                 }
-            }
+            },
+            country: String,
+            region: String,
+            required:Boolean,
+            placeholder:String
         },
         data() {
             return {
-                addressValue: '',
-                classType: {
-                    city: "P",
-                    region: "A",
-                },
+                location: '',
+                options: [],
             }
         },
         computed: {
-            featureClass() {
-                return this.classType[this.searchType];
-            },
 
-
-            dataSource() {
-
-                (async () => {
-                    const where = encodeURIComponent(JSON.stringify({
-                        "name": {
-                            "$exists": true
-                        }
-                    }));
-                    const response = await fetch(
-                        `https://parseapi.back4app.com/classes/Continentscountriescities_Country?limit=10&order=name&excludeKeys=continent,phone,currency&where=${where}`, {
-                            headers: {
-                                'X-Parse-Application-Id': 's0IT2oKrnoKps5eImgCLYS44JQSpvzjcacYwlf9G', // This is your app's application id
-                                'X-Parse-REST-API-Key': '6c39Rb8bRvhqpKCtkh0n3IiHXnz2hix9IZ5Jre7D', // This is your app's REST API key
-                            }
-                        }
-                    );
-                    const data = await response.json(); // Here you have the data that you need
-                    console.log(JSON.stringify(data, null, 2));
-                })();
-
-
-            },
             source() {
-                return "http://api.geonames.org/search?maxRows=10&username=kevin.loquencio&country=PH&type=json&featureClass=" +
-                    this.featureClass + "&q=";
+
+                return {
+                    cities: "/location/cities?country=" + this.country + "&region=" + this.region,
+                    regions: "/location/regions?country=" + this.country,
+                    countries: "/location/countries",
+                }
             }
         },
         watch: {
-            addressValue(value) {
+            location(value) {
                 this.$emit('input', value);
             },
             value(value) {
-                this.addressValue = value;
+                this.location = value;
+            },
+            country() {
+                if (this.searchType === "regions")
+                    this.loadList();
+            },
+            region() {
+                if (this.searchType === "cities")
+                    this.loadList();
             }
         },
         methods: {
-            search(q, callBack) {
-                var data = [];
-                axios.get(this.source + q).then(response => {
+            loadList() {
+                var keys = {
+                    name: "name",
+                    id: "code"
+                };
 
-                    response.data.geonames.forEach(element => {
-                        data.push({
-                            label: element.toponymName + ', ' + element.adminName1 + ' ' +
-                                element
-                                .countryName,
-                            value: element.toponymName,
-                        })
+                if (this.searchType === "regions") {
+
+                    if (!this.country) // Country is required
+                        return;
+
+                    keys.name = "region";
+                    keys.id = "region";
+                    
+                } else if (this.searchType === "cities") {
+
+                    if (!this.country || !this.region) // Region and country is required
+                        return;
+
+                    keys.name = "city";
+                    keys.id = "city";
+                }
+
+                this.options = [];
+
+                axios.get(this.source[this.searchType]).then(response => {
+
+
+                    response.data.forEach(element => {
+
+                        this.options.push({
+                            text: element[keys.name],
+                            id: element[keys.id],
+                        });
+
                     });
 
 
-                }).finally(() => {
-                    if (callBack)
-                        callBack(data);
                 });
+
             }
         },
         mounted() {
-
-            var vm = this;
-
-            vm.addressValue = vm.value;
-
-            vm.$nextTick(() => {
-                var input = vm.$el;
-                autocomplete({
-                    input: input,
-                    fetch: function (text, update) {
-                        text = text.toLowerCase();
-
-                        vm.search(text, function (data) {
-                            update(data);
-                        });
-
-                    },
-                    onSelect: function (item) {
-                        vm.addressValue = item.value;
-                    }
-                });
-            });
-        }
+            this.location = this.value;
+        },
+        beforeMount() {
+            this.loadList();
+        },
     }
 
 </script>

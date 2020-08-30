@@ -18,3 +18,6 @@ Route::get('/', function () {
 });
 
 Route::get('/temperature','WeatherController@getTemperature');
+Route::get('/location/cities','LocationFinderController@getCities');
+Route::get('/location/regions','LocationFinderController@getRegions');
+Route::get('/location/countries','LocationFinderController@getCountries');
