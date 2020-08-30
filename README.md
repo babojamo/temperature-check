@@ -16,7 +16,7 @@ In the .env file change the cache driver to database and setup the database serv
 ```
 CACHE_DRIVER=database
 ```
-Run the migration command to apply the required schemas in the database
+Run the migration command to apply the required schemas to the database
 ```
 php artisan migrate
 ```
