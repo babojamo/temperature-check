@@ -11,6 +11,16 @@ Clone the repository and install the required packages
 ```
 composer install
 ```
+
+In the .env file change the cache driver to database and setup the database server configuration
+```
+CACHE_DRIVER=database
+```
+Run the migration command to apply the required schemas to the database
+```
+php artisan migrate
+```
+
 ## Getting Started
 
 Setup first the Weather Services API configurations located in **config/weather.php** and register an account to both services to gain **api keys**
